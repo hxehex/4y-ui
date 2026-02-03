@@ -1,14 +1,14 @@
 [Unit]
-Description=x-ui Service
+Description=4y-ui Service
 After=network.target
 Wants=network.target
 
 [Service]
-EnvironmentFile=-/etc/default/x-ui
+EnvironmentFile=-/etc/default/4y-ui
 Environment="XRAY_VMESS_AEAD_FORCED=false"
 Type=simple
-WorkingDirectory=/usr/local/x-ui/
-ExecStart=/usr/local/x-ui/x-ui
+WorkingDirectory=/usr/local/4y-ui/
+ExecStart=/usr/local/4y-ui/4y-ui
 Restart=on-failure
 RestartSec=5s
 

@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+
+command="/usr/local/4y-ui/4y-ui"
+command_background=true
+pidfile="/run/4y-ui.pid"
+description="4y-ui Service"
+procname="4y-ui"
+depend() {
+    need net
+}
+start_pre(){
+    cd /usr/local/4y-ui
+}

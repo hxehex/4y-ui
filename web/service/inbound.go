@@ -1,4 +1,4 @@
-// Package service provides business logic services for the 3x-ui web panel,
+// Package service provides business logic services for the 4y-ui web panel,
 // including inbound/outbound management, user administration, settings, and Xray integration.
 package service
 
@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v2/database"
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/util/common"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/hxehex/4y-ui/v2/database"
+	"github.com/hxehex/4y-ui/v2/database/model"
+	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/v2/util/common"
+	"github.com/hxehex/4y-ui/v2/xray"
 
 	"gorm.io/gorm"
 )

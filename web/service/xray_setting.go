@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"encoding/json"
 
-	"github.com/mhsanaei/3x-ui/v2/util/common"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/hxehex/4y-ui/v2/util/common"
+	"github.com/hxehex/4y-ui/v2/xray"
 )
 
 // XraySettingService provides business logic for Xray configuration management.

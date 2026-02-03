@@ -70,9 +70,9 @@ os_version=""
 os_version=$(grep "^VERSION_ID" /etc/os-release | cut -d '=' -f2 | tr -d '"' | tr -d '.')
 
 # Declare Variables
-xui_folder="${XUI_MAIN_FOLDER:=/usr/local/x-ui}"
+xui_folder="${XUI_MAIN_FOLDER:=/usr/local/4y-ui}"
 xui_service="${XUI_SERVICE:=/etc/systemd/system}"
-log_folder="${XUI_LOG_FOLDER:=/var/log/x-ui}"
+log_folder="${XUI_LOG_FOLDER:=/var/log/4y-ui}"
 mkdir -p "${log_folder}"
 iplimit_log_path="${log_folder}/3xipl.log"
 iplimit_banned_log_path="${log_folder}/3xipl-banned.log"
@@ -108,7 +108,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/main/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/hxehex/4y-ui/main/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -119,7 +119,7 @@ install() {
 }
 
 update() {
-    confirm "This function will update all x-ui components to the latest version, and the data will not be lost. Do you want to continue?" "y"
+    confirm "This function will update all 4y-ui components to the latest version, and the data will not be lost. Do you want to continue?" "y"
     if [[ $? != 0 ]]; then
         LOGE "Cancelled"
         if [[ $# == 0 ]]; then
@@ -127,7 +127,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/main/update.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/hxehex/4y-ui/main/update.sh)
     if [[ $? == 0 ]]; then
         LOGI "Update is complete, Panel has automatically restarted "
         before_show_menu
@@ -145,9 +145,9 @@ update_menu() {
         return 0
     fi
 
-    curl -fLRo /usr/bin/x-ui https://raw.githubusercontent.com/MHSanaei/3x-ui/main/x-ui.sh
-    chmod +x ${xui_folder}/x-ui.sh
-    chmod +x /usr/bin/x-ui
+    curl -fLRo /usr/bin/4y-ui https://raw.githubusercontent.com/hxehex/4y-ui/main/4y-ui.sh
+    chmod +x ${xui_folder}/4y-ui.sh
+    chmod +x /usr/bin/4y-ui
 
     if [[ $? == 0 ]]; then
         echo -e "${green}Update successful. The panel has automatically restarted.${plain}"
@@ -167,7 +167,7 @@ legacy_version() {
         exit 1
     fi
     # Use the entered panel version in the download link
-    install_command="bash <(curl -Ls "https://raw.githubusercontent.com/mhsanaei/3x-ui/v$tag_version/install.sh") v$tag_version"
+    install_command="bash <(curl -Ls "https://raw.githubusercontent.com/hxehex/4y-ui/v$tag_version/install.sh") v$tag_version"
 
     echo "Downloading and installing panel version $tag_version..."
     eval $install_command
@@ -189,24 +189,24 @@ uninstall() {
     fi
 
     if [[ $release == "alpine" ]]; then
-        rc-service x-ui stop
-        rc-update del x-ui
-        rm /etc/init.d/x-ui -f
+        rc-service 4y-ui stop
+        rc-update del 4y-ui
+        rm /etc/init.d/4y-ui -f
     else
-        systemctl stop x-ui
-        systemctl disable x-ui
-        rm ${xui_service}/x-ui.service -f
+        systemctl stop 4y-ui
+        systemctl disable 4y-ui
+        rm ${xui_service}/4y-ui.service -f
         systemctl daemon-reload
         systemctl reset-failed
     fi
 
-    rm /etc/x-ui/ -rf
+    rm /etc/4y-ui/ -rf
     rm ${xui_folder}/ -rf
 
     echo ""
     echo -e "Uninstalled Successfully.\n"
     echo "If you need to install this panel again, you can use below command:"
-    echo -e "${green}bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)${plain}"
+    echo -e "${green}bash <(curl -Ls https://raw.githubusercontent.com/hxehex/4y-ui/master/install.sh)${plain}"
     echo ""
     # Trap the SIGTERM signal
     trap delete_script SIGTERM
@@ -229,15 +229,15 @@ reset_user() {
 
     read -rp "Do you want to disable currently configured two-factor authentication? (y/n): " twoFactorConfirm
     if [[ $twoFactorConfirm != "y" && $twoFactorConfirm != "Y" ]]; then
-        ${xui_folder}/x-ui setting -username "${config_account}" -password "${config_password}" -resetTwoFactor false >/dev/null 2>&1
+        ${xui_folder}/4y-ui setting -username "${config_account}" -password "${config_password}" -resetTwoFactor false >/dev/null 2>&1
     else
-        ${xui_folder}/x-ui setting -username "${config_account}" -password "${config_password}" -resetTwoFactor true >/dev/null 2>&1
+        ${xui_folder}/4y-ui setting -username "${config_account}" -password "${config_password}" -resetTwoFactor true >/dev/null 2>&1
         echo -e "Two factor authentication has been disabled."
     fi
     
     echo -e "Panel login username has been reset to: ${green} ${config_account} ${plain}"
     echo -e "Panel login password has been reset to: ${green} ${config_password} ${plain}"
-    echo -e "${green} Please use the new login username and password to access the X-UI panel. Also remember them! ${plain}"
+    echo -e "${green} Please use the new login username and password to access the 4y-ui panel. Also remember them! ${plain}"
     confirm_restart
 }
 
@@ -259,7 +259,7 @@ reset_webbasepath() {
     config_webBasePath=$(gen_random_string 18)
 
     # Apply the new web base path setting
-    ${xui_folder}/x-ui setting -webBasePath "${config_webBasePath}" >/dev/null 2>&1
+    ${xui_folder}/4y-ui setting -webBasePath "${config_webBasePath}" >/dev/null 2>&1
 
     echo -e "Web base path has been reset to: ${green}${config_webBasePath}${plain}"
     echo -e "${green}Please use the new web base path to access the panel.${plain}"
@@ -274,13 +274,13 @@ reset_config() {
         fi
         return 0
     fi
-    ${xui_folder}/x-ui setting -reset
+    ${xui_folder}/4y-ui setting -reset
     echo -e "All panel settings have been reset to default."
     restart
 }
 
 check_config() {
-    local info=$(${xui_folder}/x-ui setting -show true)
+    local info=$(${xui_folder}/4y-ui setting -show true)
     if [[ $? != 0 ]]; then
         LOGE "get current settings error, please check logs"
         show_menu
@@ -290,7 +290,7 @@ check_config() {
 
     local existing_webBasePath=$(echo "$info" | grep -Eo 'webBasePath: .+' | awk '{print $2}')
     local existing_port=$(echo "$info" | grep -Eo 'port: .+' | awk '{print $2}')
-    local existing_cert=$(${xui_folder}/x-ui setting -getCert true | grep 'cert:' | awk -F': ' '{print $2}' | tr -d '[:space:]')
+    local existing_cert=$(${xui_folder}/4y-ui setting -getCert true | grep 'cert:' | awk -F': ' '{print $2}' | tr -d '[:space:]')
     local server_ip=$(curl -s --max-time 3 https://api.ipify.org)
     if [ -z "$server_ip" ]; then
         server_ip=$(curl -s --max-time 3 https://4.ident.me)
@@ -334,7 +334,7 @@ set_port() {
         LOGD "Cancelled"
         before_show_menu
     else
-        ${xui_folder}/x-ui setting -port ${port}
+        ${xui_folder}/4y-ui setting -port ${port}
         echo -e "The port is set, Please restart the panel now, and use the new port ${green}${port}${plain} to access web panel"
         confirm_restart
     fi
@@ -347,14 +347,14 @@ start() {
         LOGI "Panel is running, No need to start again, If you need to restart, please select restart"
     else
         if [[ $release == "alpine" ]]; then
-            rc-service x-ui start
+            rc-service 4y-ui start
         else
-            systemctl start x-ui
+            systemctl start 4y-ui
         fi
         sleep 2
         check_status
         if [[ $? == 0 ]]; then
-            LOGI "x-ui Started Successfully"
+            LOGI "4y-ui Started Successfully"
         else
             LOGE "panel Failed to start, Probably because it takes longer than two seconds to start, Please check the log information later"
         fi
@@ -372,14 +372,14 @@ stop() {
         LOGI "Panel stopped, No need to stop again!"
     else
         if [[ $release == "alpine" ]]; then
-            rc-service x-ui stop
+            rc-service 4y-ui stop
         else
-            systemctl stop x-ui
+            systemctl stop 4y-ui
         fi
         sleep 2
         check_status
         if [[ $? == 1 ]]; then
-            LOGI "x-ui and xray stopped successfully"
+            LOGI "4y-ui and xray stopped successfully"
         else
             LOGE "Panel stop failed, Probably because the stop time exceeds two seconds, Please check the log information later"
         fi
@@ -392,14 +392,14 @@ stop() {
 
 restart() {
     if [[ $release == "alpine" ]]; then
-        rc-service x-ui restart
+        rc-service 4y-ui restart
     else
-        systemctl restart x-ui
+        systemctl restart 4y-ui
     fi
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
-        LOGI "x-ui and xray Restarted successfully"
+        LOGI "4y-ui and xray Restarted successfully"
     else
         LOGE "Panel restart failed, Probably because it takes longer than two seconds to start, Please check the log information later"
     fi
@@ -410,9 +410,9 @@ restart() {
 
 status() {
     if [[ $release == "alpine" ]]; then
-        rc-service x-ui status
+        rc-service 4y-ui status
     else
-        systemctl status x-ui -l
+        systemctl status 4y-ui -l
     fi
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -421,14 +421,14 @@ status() {
 
 enable() {
     if [[ $release == "alpine" ]]; then
-        rc-update add x-ui
+        rc-update add 4y-ui
     else
-        systemctl enable x-ui
+        systemctl enable 4y-ui
     fi
     if [[ $? == 0 ]]; then
-        LOGI "x-ui Set to boot automatically on startup successfully"
+        LOGI "4y-ui Set to boot automatically on startup successfully"
     else
-        LOGE "x-ui Failed to set Autostart"
+        LOGE "4y-ui Failed to set Autostart"
     fi
 
     if [[ $# == 0 ]]; then
@@ -438,14 +438,14 @@ enable() {
 
 disable() {
     if [[ $release == "alpine" ]]; then
-        rc-update del x-ui
+        rc-update del 4y-ui
     else
-        systemctl disable x-ui
+        systemctl disable 4y-ui
     fi
     if [[ $? == 0 ]]; then
-        LOGI "x-ui Autostart Cancelled successfully"
+        LOGI "4y-ui Autostart Cancelled successfully"
     else
-        LOGE "x-ui Failed to cancel autostart"
+        LOGE "4y-ui Failed to cancel autostart"
     fi
 
     if [[ $# == 0 ]]; then
@@ -464,7 +464,7 @@ show_log() {
             show_menu
             ;;
         1)
-            grep -F 'x-ui[' /var/log/messages
+            grep -F '4y-ui[' /var/log/messages
             if [[ $# == 0 ]]; then
                 before_show_menu
             fi
@@ -485,7 +485,7 @@ show_log() {
             show_menu
             ;;
         1)
-            journalctl -u x-ui -e --no-pager -f -p debug
+            journalctl -u 4y-ui -e --no-pager -f -p debug
             if [[ $# == 0 ]]; then
                 before_show_menu
             fi
@@ -535,11 +535,11 @@ disable_bbr() {
         before_show_menu
     fi
 
-    if [ -f "/etc/sysctl.d/99-bbr-x-ui.conf" ]; then
-        old_settings=$(head -1 /etc/sysctl.d/99-bbr-x-ui.conf | tr -d '#')
+    if [ -f "/etc/sysctl.d/99-bbr-4y-ui.conf" ]; then
+        old_settings=$(head -1 /etc/sysctl.d/99-bbr-4y-ui.conf | tr -d '#')
         sysctl -w net.core.default_qdisc="${old_settings%:*}"
         sysctl -w net.ipv4.tcp_congestion_control="${old_settings#*:}"
-        rm /etc/sysctl.d/99-bbr-x-ui.conf
+        rm /etc/sysctl.d/99-bbr-4y-ui.conf
         sysctl --system
     else
         # Replace BBR with CUBIC configurations
@@ -569,7 +569,7 @@ enable_bbr() {
             echo "#$(sysctl -n net.core.default_qdisc):$(sysctl -n net.ipv4.tcp_congestion_control)"
             echo "net.core.default_qdisc = fq"
             echo "net.ipv4.tcp_congestion_control = bbr"
-        } > "/etc/sysctl.d/99-bbr-x-ui.conf"
+        } > "/etc/sysctl.d/99-bbr-4y-ui.conf"
         if [ -f "/etc/sysctl.conf" ]; then
             # Backup old settings from sysctl.conf, if any
             sed -i 's/^net.core.default_qdisc/# &/'          /etc/sysctl.conf
@@ -593,13 +593,13 @@ enable_bbr() {
 }
 
 update_shell() {
-    curl -fLRo /usr/bin/x-ui -z /usr/bin/x-ui https://github.com/MHSanaei/3x-ui/raw/main/x-ui.sh
+    curl -fLRo /usr/bin/4y-ui -z /usr/bin/4y-ui https://github.com/hxehex/4y-ui/raw/main/4y-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
         LOGE "Failed to download script, Please check whether the machine can connect Github"
         before_show_menu
     else
-        chmod +x /usr/bin/x-ui
+        chmod +x /usr/bin/4y-ui
         LOGI "Upgrade script succeeded, Please rerun the script"
         before_show_menu
     fi
@@ -608,19 +608,19 @@ update_shell() {
 # 0: running, 1: not running, 2: not installed
 check_status() {
     if [[ $release == "alpine" ]]; then
-        if [[ ! -f /etc/init.d/x-ui ]]; then
+        if [[ ! -f /etc/init.d/4y-ui ]]; then
             return 2
         fi
-        if [[ $(rc-service x-ui status | grep -F 'status: started' -c) == 1 ]]; then
+        if [[ $(rc-service 4y-ui status | grep -F 'status: started' -c) == 1 ]]; then
             return 0
         else
             return 1
         fi
     else
-        if [[ ! -f ${xui_service}/x-ui.service ]]; then
+        if [[ ! -f ${xui_service}/4y-ui.service ]]; then
             return 2
         fi
-        temp=$(systemctl status x-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+        temp=$(systemctl status 4y-ui | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
         if [[ "${temp}" == "running" ]]; then
             return 0
         else
@@ -631,13 +631,13 @@ check_status() {
 
 check_enabled() {
     if [[ $release == "alpine" ]]; then
-        if [[ $(rc-update show | grep -F 'x-ui' | grep default -c) == 1 ]]; then
+        if [[ $(rc-update show | grep -F '4y-ui' | grep default -c) == 1 ]]; then
             return 0
         else
             return 1
         fi
     else
-        temp=$(systemctl is-enabled x-ui)
+        temp=$(systemctl is-enabled 4y-ui)
         if [[ "${temp}" == "enabled" ]]; then
             return 0
         else
@@ -1078,7 +1078,7 @@ ssl_cert_issue_main() {
                 local webKeyFile="/root/cert/${domain}/privkey.pem"
 
                 if [[ -f "${webCertFile}" && -f "${webKeyFile}" ]]; then
-                    ${xui_folder}/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
+                    ${xui_folder}/4y-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
                     echo "Panel paths set for domain: $domain"
                     echo "  - Certificate File: $webCertFile"
                     echo "  - Private Key File: $webKeyFile"
@@ -1115,8 +1115,8 @@ ssl_cert_issue_for_ip() {
     LOGI "Starting automatic SSL certificate generation for server IP..."
     LOGI "Using Let's Encrypt shortlived profile (~6 days validity, auto-renews)"
     
-    local existing_webBasePath=$(${xui_folder}/x-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
-    local existing_port=$(${xui_folder}/x-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
+    local existing_webBasePath=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
+    local existing_port=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
     
     # Get server IP
     local server_ip=$(curl -s --max-time 3 https://api.ipify.org)
@@ -1223,7 +1223,7 @@ ssl_cert_issue_for_ip() {
     done
     
     # Reload command - restarts panel after renewal
-    local reloadCmd="systemctl restart x-ui 2>/dev/null || rc-service x-ui restart 2>/dev/null"
+    local reloadCmd="systemctl restart 4y-ui 2>/dev/null || rc-service 4y-ui restart 2>/dev/null"
     
     # issue the certificate for IP with shortlived profile
     ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt --force
@@ -1278,7 +1278,7 @@ ssl_cert_issue_for_ip() {
     local webKeyFile="${certPath}/privkey.pem"
     
     if [[ -f "$webCertFile" && -f "$webKeyFile" ]]; then
-        ${xui_folder}/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
+        ${xui_folder}/4y-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
         LOGI "Certificate configured for panel"
         LOGI "  - Certificate File: $webCertFile"
         LOGI "  - Private Key File: $webKeyFile"
@@ -1294,8 +1294,8 @@ ssl_cert_issue_for_ip() {
 }
 
 ssl_cert_issue() {
-    local existing_webBasePath=$(${xui_folder}/x-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
-    local existing_port=$(${xui_folder}/x-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
+    local existing_webBasePath=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
+    local existing_port=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
     # check for acme.sh first
     if ! command -v ~/.acme.sh/acme.sh &>/dev/null; then
         echo "acme.sh could not be found. we will install it"
@@ -1401,24 +1401,24 @@ ssl_cert_issue() {
         LOGE "Issuing certificate succeeded, installing certificates..."
     fi
 
-    reloadCmd="x-ui restart"
+    reloadCmd="4y-ui restart"
 
-    LOGI "Default --reloadcmd for ACME is: ${yellow}x-ui restart"
+    LOGI "Default --reloadcmd for ACME is: ${yellow}4y-ui restart"
     LOGI "This command will run on every certificate issue and renew."
     read -rp "Would you like to modify --reloadcmd for ACME? (y/n): " setReloadcmd
     if [[ "$setReloadcmd" == "y" || "$setReloadcmd" == "Y" ]]; then
-        echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; x-ui restart"
+        echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; 4y-ui restart"
         echo -e "${green}\t2.${plain} Input your own command"
         echo -e "${green}\t0.${plain} Keep default reloadcmd"
         read -rp "Choose an option: " choice
         case "$choice" in
         1)
-            LOGI "Reloadcmd is: systemctl reload nginx ; x-ui restart"
-            reloadCmd="systemctl reload nginx ; x-ui restart"
+            LOGI "Reloadcmd is: systemctl reload nginx ; 4y-ui restart"
+            reloadCmd="systemctl reload nginx ; 4y-ui restart"
             ;;
         2)  
-            LOGD "It's recommended to put x-ui restart at the end, so it won't raise an error if other services fails"
-            read -rp "Please enter your reloadcmd (example: systemctl reload nginx ; x-ui restart): " reloadCmd
+            LOGD "It's recommended to put 4y-ui restart at the end, so it won't raise an error if other services fails"
+            read -rp "Please enter your reloadcmd (example: systemctl reload nginx ; 4y-ui restart): " reloadCmd
             LOGI "Your reloadcmd is: ${reloadCmd}"
             ;;
         *)
@@ -1462,7 +1462,7 @@ ssl_cert_issue() {
         local webKeyFile="/root/cert/${domain}/privkey.pem"
 
         if [[ -f "$webCertFile" && -f "$webKeyFile" ]]; then
-            ${xui_folder}/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
+            ${xui_folder}/4y-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
             LOGI "Panel paths set for domain: $domain"
             LOGI "  - Certificate File: $webCertFile"
             LOGI "  - Private Key File: $webKeyFile"
@@ -1477,8 +1477,8 @@ ssl_cert_issue() {
 }
 
 ssl_cert_issue_CF() {
-    local existing_webBasePath=$(${xui_folder}/x-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
-    local existing_port=$(${xui_folder}/x-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
+    local existing_webBasePath=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
+    local existing_port=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
     LOGI "****** Instructions for Use ******"
     LOGI "Follow the steps below to complete the process:"
     LOGI "1. Cloudflare Registered E-mail."
@@ -1548,24 +1548,24 @@ ssl_cert_issue_CF() {
             exit 1
         fi
 
-        reloadCmd="x-ui restart"
+        reloadCmd="4y-ui restart"
 
-        LOGI "Default --reloadcmd for ACME is: ${yellow}x-ui restart"
+        LOGI "Default --reloadcmd for ACME is: ${yellow}4y-ui restart"
         LOGI "This command will run on every certificate issue and renew."
         read -rp "Would you like to modify --reloadcmd for ACME? (y/n): " setReloadcmd
         if [[ "$setReloadcmd" == "y" || "$setReloadcmd" == "Y" ]]; then
-            echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; x-ui restart"
+            echo -e "\n${green}\t1.${plain} Preset: systemctl reload nginx ; 4y-ui restart"
             echo -e "${green}\t2.${plain} Input your own command"
             echo -e "${green}\t0.${plain} Keep default reloadcmd"
             read -rp "Choose an option: " choice
             case "$choice" in
             1)
-                LOGI "Reloadcmd is: systemctl reload nginx ; x-ui restart"
-                reloadCmd="systemctl reload nginx ; x-ui restart"
+                LOGI "Reloadcmd is: systemctl reload nginx ; 4y-ui restart"
+                reloadCmd="systemctl reload nginx ; 4y-ui restart"
                 ;;
             2)  
-                LOGD "It's recommended to put x-ui restart at the end, so it won't raise an error if other services fails"
-                read -rp "Please enter your reloadcmd (example: systemctl reload nginx ; x-ui restart): " reloadCmd
+                LOGD "It's recommended to put 4y-ui restart at the end, so it won't raise an error if other services fails"
+                read -rp "Please enter your reloadcmd (example: systemctl reload nginx ; 4y-ui restart): " reloadCmd
                 LOGI "Your reloadcmd is: ${reloadCmd}"
                 ;;
             *)
@@ -1603,7 +1603,7 @@ ssl_cert_issue_CF() {
             local webKeyFile="${certPath}/privkey.pem"
 
             if [[ -f "$webCertFile" && -f "$webKeyFile" ]]; then
-                ${xui_folder}/x-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
+                ${xui_folder}/4y-ui cert -webCert "$webCertFile" -webCertKey "$webKeyFile"
                 LOGI "Panel paths set for domain: $CF_Domain"
                 LOGI "  - Certificate File: $webCertFile"
                 LOGI "  - Private Key File: $webKeyFile"
@@ -2067,11 +2067,11 @@ SSH_port_forwarding() {
             break
         fi
     done
-    local existing_webBasePath=$(${xui_folder}/x-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
-    local existing_port=$(${xui_folder}/x-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
-    local existing_listenIP=$(${xui_folder}/x-ui setting -getListen true | grep -Eo 'listenIP: .+' | awk '{print $2}')
-    local existing_cert=$(${xui_folder}/x-ui setting -getCert true | grep -Eo 'cert: .+' | awk '{print $2}')
-    local existing_key=$(${xui_folder}/x-ui setting -getCert true | grep -Eo 'key: .+' | awk '{print $2}')
+    local existing_webBasePath=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}')
+    local existing_port=$(${xui_folder}/4y-ui setting -show true | grep -Eo 'port: .+' | awk '{print $2}')
+    local existing_listenIP=$(${xui_folder}/4y-ui setting -getListen true | grep -Eo 'listenIP: .+' | awk '{print $2}')
+    local existing_cert=$(${xui_folder}/4y-ui setting -getCert true | grep -Eo 'cert: .+' | awk '{print $2}')
+    local existing_key=$(${xui_folder}/4y-ui setting -getCert true | grep -Eo 'key: .+' | awk '{print $2}')
 
     local config_listenIP=""
     local listen_choice=""
@@ -2112,7 +2112,7 @@ SSH_port_forwarding() {
             config_listenIP="127.0.0.1"
             [[ "$listen_choice" == "2" ]] && read -rp "Enter custom IP to listen on: " config_listenIP
 
-            ${xui_folder}/x-ui setting -listenIP "${config_listenIP}" >/dev/null 2>&1
+            ${xui_folder}/4y-ui setting -listenIP "${config_listenIP}" >/dev/null 2>&1
             echo -e "${green}listen IP has been set to ${config_listenIP}.${plain}"
             echo -e "\n${green}SSH Port Forwarding Configuration:${plain}"
             echo -e "Standard SSH command:"
@@ -2128,7 +2128,7 @@ SSH_port_forwarding() {
         fi
         ;;
     2)
-        ${xui_folder}/x-ui setting -listenIP 0.0.0.0 >/dev/null 2>&1
+        ${xui_folder}/4y-ui setting -listenIP 0.0.0.0 >/dev/null 2>&1
         echo -e "${green}Listen IP has been cleared.${plain}"
         restart
         ;;
@@ -2144,30 +2144,30 @@ SSH_port_forwarding() {
 
 show_usage() {
     echo -e "┌────────────────────────────────────────────────────────────────┐
-│  ${blue}x-ui control menu usages (subcommands):${plain}                       │
+│  ${blue}4y-ui control menu usages (subcommands):${plain}                       │
 │                                                                │
-│  ${blue}x-ui${plain}                       - Admin Management Script          │
-│  ${blue}x-ui start${plain}                 - Start                            │
-│  ${blue}x-ui stop${plain}                  - Stop                             │
-│  ${blue}x-ui restart${plain}               - Restart                          │
-│  ${blue}x-ui status${plain}                - Current Status                   │
-│  ${blue}x-ui settings${plain}              - Current Settings                 │
-│  ${blue}x-ui enable${plain}                - Enable Autostart on OS Startup   │
-│  ${blue}x-ui disable${plain}               - Disable Autostart on OS Startup  │
-│  ${blue}x-ui log${plain}                   - Check logs                       │
-│  ${blue}x-ui banlog${plain}                - Check Fail2ban ban logs          │
-│  ${blue}x-ui update${plain}                - Update                           │
-│  ${blue}x-ui update-all-geofiles${plain}   - Update all geo files             │
-│  ${blue}x-ui legacy${plain}                - Legacy version                   │
-│  ${blue}x-ui install${plain}               - Install                          │
-│  ${blue}x-ui uninstall${plain}             - Uninstall                        │
+│  ${blue}4y-ui${plain}                       - Admin Management Script          │
+│  ${blue}4y-ui start${plain}                 - Start                            │
+│  ${blue}4y-ui stop${plain}                  - Stop                             │
+│  ${blue}4y-ui restart${plain}               - Restart                          │
+│  ${blue}4y-ui status${plain}                - Current Status                   │
+│  ${blue}4y-ui settings${plain}              - Current Settings                 │
+│  ${blue}4y-ui enable${plain}                - Enable Autostart on OS Startup   │
+│  ${blue}4y-ui disable${plain}               - Disable Autostart on OS Startup  │
+│  ${blue}4y-ui log${plain}                   - Check logs                       │
+│  ${blue}4y-ui banlog${plain}                - Check Fail2ban ban logs          │
+│  ${blue}4y-ui update${plain}                - Update                           │
+│  ${blue}4y-ui update-all-geofiles${plain}   - Update all geo files             │
+│  ${blue}4y-ui legacy${plain}                - Legacy version                   │
+│  ${blue}4y-ui install${plain}               - Install                          │
+│  ${blue}4y-ui uninstall${plain}             - Uninstall                        │
 └────────────────────────────────────────────────────────────────┘"
 }
 
 show_menu() {
     echo -e "
 ╔────────────────────────────────────────────────╗
-│   ${green}3X-UI Panel Management Script${plain}                │
+│   ${green}4y-ui Panel Management Script${plain}                │
 │   ${green}0.${plain} Exit Script                               │
 │────────────────────────────────────────────────│
 │   ${green}1.${plain} Install                                   │

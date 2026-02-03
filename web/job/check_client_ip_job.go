@@ -12,10 +12,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v2/database"
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/hxehex/4y-ui/v2/database"
+	"github.com/hxehex/4y-ui/v2/database/model"
+	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/v2/xray"
 )
 
 // CheckClientIpJob monitors client IP addresses from access logs and manages IP blocking based on configured limits.
@@ -53,7 +53,7 @@ func (j *CheckClientIpJob) Run() {
 					shouldClearAccessLog = j.processLogFile()
 				} else {
 					if !f2bInstalled {
-						logger.Warning("[LimitIP] Fail2Ban is not installed, Please install Fail2Ban from the x-ui bash menu.")
+						logger.Warning("[LimitIP] Fail2Ban is not installed, Please install Fail2Ban from the 4y-ui bash menu.")
 					}
 				}
 			}

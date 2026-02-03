@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v2/web/global"
-	"github.com/mhsanaei/3x-ui/v2/web/service"
-	"github.com/mhsanaei/3x-ui/v2/web/websocket"
+	"github.com/hxehex/4y-ui/v2/web/global"
+	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/v2/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )
@@ -259,7 +259,7 @@ func (a *ServerController) getDb(c *gin.Context) {
 		return
 	}
 
-	filename := "x-ui.db"
+	filename := "4y-ui.db"
 
 	if !isValidFilename(filename) {
 		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid filename"))

@@ -1,4 +1,4 @@
-name: Release 3X-UI
+name: Release 4y-ui
 
 on:
   workflow_dispatch:
@@ -17,9 +17,9 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - 'x-ui.service.debian'
-      - 'x-ui.service.arch'
-      - 'x-ui.service.rhel'
+      - '4y-ui.service.debian'
+      - '4y-ui.service.arch'
+      - '4y-ui.service.rhel'
 
 jobs:
   build:
@@ -46,7 +46,7 @@ jobs:
           go-version-file: go.mod
           check-latest: true
 
-      - name: Build 3X-UI
+      - name: Build 4y-ui
         run: |
           export CGO_ENABLED=1
           export GOOS=linux
@@ -78,15 +78,15 @@ jobs:
           file xui-release
           ldd xui-release || echo "Static binary confirmed"
           
-          mkdir x-ui
-          cp xui-release x-ui/
-          cp x-ui.service.debian x-ui/
-          cp x-ui.service.arch x-ui/
-          cp x-ui.service.rhel x-ui/
-          cp x-ui.sh x-ui/
-          mv x-ui/xui-release x-ui/x-ui
-          mkdir x-ui/bin
-          cd x-ui/bin
+          mkdir 4y-ui
+          cp xui-release 4y-ui/
+          cp 4y-ui.service.debian 4y-ui/
+          cp 4y-ui.service.arch 4y-ui/
+          cp 4y-ui.service.rhel 4y-ui/
+          cp 4y-ui.sh 4y-ui/
+          mv 4y-ui/xui-release 4y-ui/4y-ui
+          mkdir 4y-ui/bin
+          cd 4y-ui/bin
           
           # Download dependencies
           Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/"
@@ -130,13 +130,13 @@ jobs:
           cd ../..
           
       - name: Package
-        run: tar -zcvf x-ui-linux-${{ matrix.platform }}.tar.gz x-ui
+        run: tar -zcvf 4y-ui-linux-${{ matrix.platform }}.tar.gz 4y-ui
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: x-ui-linux-${{ matrix.platform }}
-          path: ./x-ui-linux-${{ matrix.platform }}.tar.gz
+          name: 4y-ui-linux-${{ matrix.platform }}
+          path: ./4y-ui-linux-${{ matrix.platform }}.tar.gz
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -146,8 +146,8 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: x-ui-linux-${{ matrix.platform }}.tar.gz
-          asset_name: x-ui-linux-${{ matrix.platform }}.tar.gz
+          file: 4y-ui-linux-${{ matrix.platform }}.tar.gz
+          asset_name: 4y-ui-linux-${{ matrix.platform }}.tar.gz
           overwrite: true
           prerelease: true
 
@@ -183,7 +183,7 @@ jobs:
             mingw-w64-x86_64-sqlite3
             mingw-w64-x86_64-pkg-config
 
-      - name: Build 3X-UI for Windows (CGO)
+      - name: Build 4y-ui for Windows (CGO)
         shell: msys2 {0}
         run: |
           export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
@@ -202,10 +202,10 @@ jobs:
       - name: Copy and download resources
         shell: pwsh
         run: |
-          mkdir x-ui
-          Copy-Item xui-release.exe x-ui\x-ui.exe
-          mkdir x-ui\bin
-          cd x-ui\bin
+          mkdir 4y-ui
+          Copy-Item xui-release.exe 4y-ui\4y-ui.exe
+          mkdir 4y-ui\bin
+          cd 4y-ui\bin
           
           # Download Xray for Windows
           $Xray_URL = "https://github.com/XTLS/Xray-core/releases/download/v26.2.2/"
@@ -227,13 +227,13 @@ jobs:
       - name: Package to Zip
         shell: pwsh
         run: |
-          Compress-Archive -Path .\x-ui -DestinationPath "x-ui-windows-amd64.zip"
+          Compress-Archive -Path .\4y-ui -DestinationPath "4y-ui-windows-amd64.zip"
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: x-ui-windows-amd64
-          path: ./x-ui-windows-amd64.zip
+          name: 4y-ui-windows-amd64
+          path: ./4y-ui-windows-amd64.zip
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -243,7 +243,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: x-ui-windows-amd64.zip
-          asset_name: x-ui-windows-amd64.zip
+          file: 4y-ui-windows-amd64.zip
+          asset_name: 4y-ui-windows-amd64.zip
           overwrite: true
           prerelease: true

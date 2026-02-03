@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/web/service"
-	"github.com/mhsanaei/3x-ui/v2/web/session"
-	"github.com/mhsanaei/3x-ui/v2/web/websocket"
+	"github.com/hxehex/4y-ui/v2/database/model"
+	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/v2/web/session"
+	"github.com/hxehex/4y-ui/v2/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )

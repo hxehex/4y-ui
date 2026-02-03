@@ -23,7 +23,7 @@ main
 
 # Ignore script and executable files
 /release.sh
-/x-ui
+/4y-ui
 
 # Ignore OS specific files
 .DS_Store
@@ -31,7 +31,7 @@ Thumbs.db
 
 # Ignore Go build files
 *.exe
-x-ui.db
+4y-ui.db
 
 # Ignore Docker specific files
 docker-compose.override.yml
