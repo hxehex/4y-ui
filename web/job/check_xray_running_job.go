@@ -3,8 +3,8 @@
 package job
 
 import (
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/service"
 )
 
 // CheckXrayRunningJob monitors Xray process health and restarts it if it crashes.

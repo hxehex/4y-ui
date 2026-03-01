@@ -5,7 +5,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/logger"
 )
 
 // PanelService provides business logic for panel management operations.

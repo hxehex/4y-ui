@@ -12,10 +12,10 @@ import (
 	"path"
 	"slices"
 
-	"github.com/hxehex/4y-ui/v2/config"
-	"github.com/hxehex/4y-ui/v2/database/model"
-	"github.com/hxehex/4y-ui/v2/util/crypto"
-	"github.com/hxehex/4y-ui/v2/xray"
+	"github.com/hxehex/4y-ui/config"
+	"github.com/hxehex/4y-ui/database/model"
+	"github.com/hxehex/4y-ui/util/crypto"
+	"github.com/hxehex/4y-ui/xray"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

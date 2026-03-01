@@ -15,13 +15,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/common"
-	webpkg "github.com/hxehex/4y-ui/v2/web"
-	"github.com/hxehex/4y-ui/v2/web/locale"
-	"github.com/hxehex/4y-ui/v2/web/middleware"
-	"github.com/hxehex/4y-ui/v2/web/network"
-	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/common"
+	webpkg "github.com/hxehex/4y-ui/web"
+	"github.com/hxehex/4y-ui/web/locale"
+	"github.com/hxehex/4y-ui/web/middleware"
+	"github.com/hxehex/4y-ui/web/network"
+	"github.com/hxehex/4y-ui/web/service"
 
 	"github.com/gin-gonic/gin"
 )

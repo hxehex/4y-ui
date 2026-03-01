@@ -5,9 +5,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/session"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/session"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

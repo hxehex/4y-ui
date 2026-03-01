@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/common"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/common"
 
 	"github.com/xtls/xray-core/app/proxyman/command"
 	statsService "github.com/xtls/xray-core/app/stats/command"

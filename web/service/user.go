@@ -3,11 +3,11 @@ package service
 import (
 	"errors"
 
-	"github.com/hxehex/4y-ui/v2/database"
-	"github.com/hxehex/4y-ui/v2/database/model"
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/crypto"
-	ldaputil "github.com/hxehex/4y-ui/v2/util/ldap"
+	"github.com/hxehex/4y-ui/database"
+	"github.com/hxehex/4y-ui/database/model"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/crypto"
+	ldaputil "github.com/hxehex/4y-ui/util/ldap"
 	"github.com/xlzd/gotp"
 	"gorm.io/gorm"
 )

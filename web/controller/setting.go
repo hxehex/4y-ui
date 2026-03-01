@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/util/crypto"
-	"github.com/hxehex/4y-ui/v2/web/entity"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/session"
+	"github.com/hxehex/4y-ui/util/crypto"
+	"github.com/hxehex/4y-ui/web/entity"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/session"
 
 	"github.com/gin-gonic/gin"
 )

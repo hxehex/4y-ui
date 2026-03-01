@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/config"
+	"github.com/hxehex/4y-ui/config"
 
 	"github.com/gin-gonic/gin"
 )

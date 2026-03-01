@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/logger"
 )
 
 // NewLogWriter returns a new LogWriter for processing Xray log output.

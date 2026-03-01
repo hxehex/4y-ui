@@ -4,8 +4,8 @@ package model
 import (
 	"fmt"
 
-	"github.com/hxehex/4y-ui/v2/util/json_util"
-	"github.com/hxehex/4y-ui/v2/xray"
+	"github.com/hxehex/4y-ui/util/json_util"
+	"github.com/hxehex/4y-ui/xray"
 )
 
 // Protocol represents the protocol type for Xray inbounds.

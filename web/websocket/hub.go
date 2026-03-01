@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/logger"
 )
 
 // MessageType represents the type of WebSocket message

@@ -7,12 +7,12 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/database/model"
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/json_util"
-	"github.com/hxehex/4y-ui/v2/util/random"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/xray"
+	"github.com/hxehex/4y-ui/database/model"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/json_util"
+	"github.com/hxehex/4y-ui/util/random"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/xray"
 )
 
 //go:embed default.json

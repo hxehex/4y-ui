@@ -3,10 +3,10 @@ package job
 import (
 	"encoding/json"
 
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/websocket"
-	"github.com/hxehex/4y-ui/v2/xray"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/websocket"
+	"github.com/hxehex/4y-ui/xray"
 
 	"github.com/valyala/fasthttp"
 )

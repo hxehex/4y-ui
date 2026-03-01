@@ -13,9 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/config"
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/common"
+	"github.com/hxehex/4y-ui/config"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/common"
 )
 
 // GetBinaryName returns the Xray binary filename for the current OS and architecture.

@@ -5,10 +5,10 @@ import (
 
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/database/model"
-	"github.com/hxehex/4y-ui/v2/logger"
-	ldaputil "github.com/hxehex/4y-ui/v2/util/ldap"
-	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/database/model"
+	"github.com/hxehex/4y-ui/logger"
+	ldaputil "github.com/hxehex/4y-ui/util/ldap"
+	"github.com/hxehex/4y-ui/web/service"
 
 	"strconv"
 

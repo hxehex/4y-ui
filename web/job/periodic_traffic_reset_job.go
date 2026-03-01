@@ -1,8 +1,8 @@
 package job
 
 import (
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/service"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/service"
 )
 
 // Period represents the time period for traffic resets.

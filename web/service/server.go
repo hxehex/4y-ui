@@ -20,12 +20,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/config"
-	"github.com/hxehex/4y-ui/v2/database"
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/util/common"
-	"github.com/hxehex/4y-ui/v2/util/sys"
-	"github.com/hxehex/4y-ui/v2/xray"
+	"github.com/hxehex/4y-ui/config"
+	"github.com/hxehex/4y-ui/database"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/util/common"
+	"github.com/hxehex/4y-ui/util/sys"
+	"github.com/hxehex/4y-ui/xray"
 
 	"github.com/google/uuid"
 	"github.com/shirou/gopsutil/v4/cpu"

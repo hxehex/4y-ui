@@ -12,8 +12,8 @@
 [![GO Version](https://img.shields.io/github/go-mod/go-version/hxehex/4y-ui.svg)](#)
 [![Downloads](https://img.shields.io/github/downloads/hxehex/4y-ui/total.svg)](https://github.com/hxehex/4y-ui/releases/latest)
 [![License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Go Reference](https://pkg.go.dev/badge/github.com/hxehex/4y-ui/v2.svg)](https://pkg.go.dev/github.com/hxehex/4y-ui/v2)
-[![Go Report Card](https://goreportcard.com/badge/github.com/hxehex/4y-ui/v2)](https://goreportcard.com/report/github.com/hxehex/4y-ui/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hxehex/4y-ui.svg)](https://pkg.go.dev/github.com/hxehex/4y-ui)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hxehex/4y-ui)](https://goreportcard.com/report/github.com/hxehex/4y-ui)
 
 **4y-ui** — panel de control avanzado basado en web de código abierto diseñado para gestionar el servidor Xray-core. Ofrece una interfaz fácil de usar para configurar y monitorear varios protocolos VPN y proxy.
 

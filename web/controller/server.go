@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/web/global"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/websocket"
+	"github.com/hxehex/4y-ui/web/global"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )

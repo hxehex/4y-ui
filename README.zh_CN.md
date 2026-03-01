@@ -12,8 +12,8 @@
 [![GO Version](https://img.shields.io/github/go-mod/go-version/hxehex/4y-ui.svg)](#)
 [![Downloads](https://img.shields.io/github/downloads/hxehex/4y-ui/total.svg)](https://github.com/hxehex/4y-ui/releases/latest)
 [![License](https://img.shields.io/badge/license-GPL%20V3-blue.svg?longCache=true)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Go Reference](https://pkg.go.dev/badge/github.com/hxehex/4y-ui/v2.svg)](https://pkg.go.dev/github.com/hxehex/4y-ui/v2)
-[![Go Report Card](https://goreportcard.com/badge/github.com/hxehex/4y-ui/v2)](https://goreportcard.com/report/github.com/hxehex/4y-ui/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hxehex/4y-ui.svg)](https://pkg.go.dev/github.com/hxehex/4y-ui)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hxehex/4y-ui)](https://goreportcard.com/report/github.com/hxehex/4y-ui)
 
 **4y-ui** — 一个基于网页的高级开源控制面板，专为管理 Xray-core 服务器而设计。它提供了用户友好的界面，用于配置和监控各种 VPN 和代理协议。
 

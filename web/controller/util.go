@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/hxehex/4y-ui/v2/config"
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/entity"
+	"github.com/hxehex/4y-ui/config"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/entity"
 
 	"github.com/gin-gonic/gin"
 )

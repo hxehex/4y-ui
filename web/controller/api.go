@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/session"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/session"
 
 	"github.com/gin-gonic/gin"
 )

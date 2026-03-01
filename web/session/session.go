@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"net/http"
 
-	"github.com/hxehex/4y-ui/v2/database/model"
+	"github.com/hxehex/4y-ui/database/model"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

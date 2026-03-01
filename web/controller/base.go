@@ -5,9 +5,9 @@ package controller
 import (
 	"net/http"
 
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/locale"
-	"github.com/hxehex/4y-ui/v2/web/session"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/locale"
+	"github.com/hxehex/4y-ui/web/session"
 
 	"github.com/gin-gonic/gin"
 )

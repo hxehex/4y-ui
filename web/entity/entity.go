@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/util/common"
+	"github.com/hxehex/4y-ui/util/common"
 )
 
 // Msg represents a standard API response message with success status, message text, and optional data object.

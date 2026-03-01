@@ -2,8 +2,8 @@
 package websocket
 
 import (
-	"github.com/hxehex/4y-ui/v2/logger"
-	"github.com/hxehex/4y-ui/v2/web/global"
+	"github.com/hxehex/4y-ui/logger"
+	"github.com/hxehex/4y-ui/web/global"
 )
 
 // GetHub returns the global WebSocket hub instance

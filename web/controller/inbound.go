@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/database/model"
-	"github.com/hxehex/4y-ui/v2/web/service"
-	"github.com/hxehex/4y-ui/v2/web/session"
-	"github.com/hxehex/4y-ui/v2/web/websocket"
+	"github.com/hxehex/4y-ui/database/model"
+	"github.com/hxehex/4y-ui/web/service"
+	"github.com/hxehex/4y-ui/web/session"
+	"github.com/hxehex/4y-ui/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )

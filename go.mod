@@ -10,7 +10,6 @@ require (
 	github.com/goccy/go-json v0.10.5
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/hxehex/4y-ui/v2 v2.0.0-20260301120326-de5bcb05dd52
 	github.com/joho/godotenv v1.5.1
 	github.com/mymmrac/telego v1.6.0
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
@@ -72,6 +71,7 @@ require (
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/refraction-networking/utls v1.8.2 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/sagernet/sing v0.8.0 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.9 // indirect
 	github.com/tklauser/go-sysconf v0.3.16 // indirect

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hxehex/4y-ui/v2/logger"
+	"github.com/hxehex/4y-ui/logger"
 )
 
 // NewErrorf creates a new error with formatted message.

@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hxehex/4y-ui/v2/config"
+	"github.com/hxehex/4y-ui/config"
 	"github.com/op/go-logging"
 )
 
