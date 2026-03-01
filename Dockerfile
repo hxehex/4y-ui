@@ -1,26 +1,32 @@
-# ========================================================
-# Stage: Builder
-# ========================================================
-FROM golang:1.25-alpine AS builder
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.3.0 AS xx
+
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS builder
+COPY --from=xx / /
 WORKDIR /app
+
+ARG TARGETPLATFORM
 ARG TARGETARCH
 
 RUN apk --no-cache --update add \
-  build-base \
-  gcc \
+  clang \
+  lld \
   curl \
   unzip
+
+RUN xx-apk --no-cache --update add \
+  build-base \
+  gcc \
+  musl-dev
 
 COPY . .
 
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
-RUN go build -ldflags "-w -s" -o build/4y-ui main.go
+
+RUN xx-go build -ldflags "-w -s" -o build/4y-ui main.go
+
 RUN ./DockerInit.sh "$TARGETARCH"
 
-# ========================================================
-# Stage: Final Image of 4y-ui
-# ========================================================
 FROM alpine
 ENV TZ=Asia/Tehran
 WORKDIR /app
@@ -36,8 +42,6 @@ COPY --from=builder /app/build/ /app/
 COPY --from=builder /app/DockerEntrypoint.sh /app/
 COPY --from=builder /app/4y-ui.sh /usr/bin/4y-ui
 
-
-# Configure fail2ban
 RUN rm -f /etc/fail2ban/jail.d/alpine-ssh.conf \
   && cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local \
   && sed -i "s/^\[ssh\]$/&\nenabled = false/" /etc/fail2ban/jail.local \
@@ -53,4 +57,4 @@ ENV XUI_ENABLE_FAIL2BAN="true"
 EXPOSE 2053
 VOLUME [ "/etc/4y-ui" ]
 CMD [ "./4y-ui" ]
-ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
+ENTRYPOINT[ "/app/DockerEntrypoint.sh" ]
