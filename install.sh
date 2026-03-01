@@ -772,7 +772,7 @@ install_4y-ui() {
             fi
         fi
         echo -e "Got 4y-ui latest version: ${tag_version}, beginning the installation..."
-        curl -4fLRo ${xui_folder}-linux-$(arch).tar.gz https://github.com/hxehex/4y-ui/releases/download/${tag_version}/4y-ui-linux-$(arch).tar.gz
+        curl -4fLRo ${xui_folder}-linux-$(arch).tar.xz https://github.com/hxehex/4y-ui/releases/download/${tag_version}/4y-ui-linux-$(arch).tar.xz
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Downloading 4y-ui failed, please be sure that your server can access GitHub ${plain}"
             exit 1
@@ -787,9 +787,9 @@ install_4y-ui() {
             exit 1
         fi
         
-        url="https://github.com/hxehex/4y-ui/releases/download/${tag_version}/4y-ui-linux-$(arch).tar.gz"
+        url="https://github.com/hxehex/4y-ui/releases/download/${tag_version}/4y-ui-linux-$(arch).tar.xz"
         echo -e "Beginning to install 4y-ui $1"
-        curl -4fLRo ${xui_folder}-linux-$(arch).tar.gz ${url}
+        curl -4fLRo ${xui_folder}-linux-$(arch).tar.xz ${url}
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Download 4y-ui $1 failed, please check if the version exists ${plain}"
             exit 1
@@ -812,8 +812,8 @@ install_4y-ui() {
     fi
     
     # Extract resources and set permissions
-    tar zxvf 4y-ui-linux-$(arch).tar.gz
-    rm 4y-ui-linux-$(arch).tar.gz -f
+    tar xf 4y-ui-linux-$(arch).tar.xz
+    rm 4y-ui-linux-$(arch).tar.xz -f
     
     cd 4y-ui
     chmod +x 4y-ui

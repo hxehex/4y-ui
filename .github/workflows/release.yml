@@ -27,10 +27,10 @@ jobs:
           check-latest: true
           cache: true
 
-      - name: Install Native Cross-Compilers
+      - name: Install Native Cross-Compilers & Archivers
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi gcc-i686-linux-gnu gcc-s390x-linux-gnu gcc-mipsel-linux-gnu gcc-mips-linux-gnu mingw-w64 zip
+          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi gcc-i686-linux-gnu gcc-s390x-linux-gnu gcc-mipsel-linux-gnu gcc-mips-linux-gnu mingw-w64 xz-utils p7zip-full
 
       - name: Download Shared Assets (GeoIP/Geosite)
         run: |
@@ -63,31 +63,62 @@ jobs:
             export GOARM=""
             export GOMIPS=""
             
-            if [ "$OS" == "linux" ]; then
-              if [ "$ARCH" == "amd64" ]; then export CC=gcc; XRAY_ARCH="64"
-              elif [ "$ARCH" == "arm64" ]; then export CC=aarch64-linux-gnu-gcc; XRAY_ARCH="arm64-v8a"
-              elif [ "$ARCH" == "armv7" ]; then export GOARCH=arm; export GOARM=7; export CC=arm-linux-gnueabihf-gcc; XRAY_ARCH="arm32-v7a"
-              elif [ "$ARCH" == "armv6" ]; then export GOARCH=arm; export GOARM=6; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v6"
-              elif [ "$ARCH" == "armv5" ]; then export GOARCH=arm; export GOARM=5; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v5"
-              elif [ "$ARCH" == "386" ]; then export CC=i686-linux-gnu-gcc; XRAY_ARCH="32"
-              elif [ "$ARCH" == "s390x" ]; then export CC=s390x-linux-gnu-gcc; XRAY_ARCH="s390x"
-              elif [ "$ARCH" == "mipsle" ]; then export CC=mipsel-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32le"
-              elif [ "$ARCH" == "mips" ]; then export CC=mips-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32"
+            # Explicit multi-line bash to guarantee zero syntax errors
+            if [ "$OS" = "linux" ]; then
+              if [ "$ARCH" = "amd64" ]; then
+                export CC=gcc
+                XRAY_ARCH="64"
+              elif [ "$ARCH" = "arm64" ]; then
+                export CC=aarch64-linux-gnu-gcc
+                XRAY_ARCH="arm64-v8a"
+              elif [ "$ARCH" = "armv7" ]; then
+                export GOARCH=arm
+                export GOARM=7
+                export CC=arm-linux-gnueabihf-gcc
+                XRAY_ARCH="arm32-v7a"
+              elif [ "$ARCH" = "armv6" ]; then
+                export GOARCH=arm
+                export GOARM=6
+                export CC=arm-linux-gnueabi-gcc
+                XRAY_ARCH="arm32-v6"
+              elif [ "$ARCH" = "armv5" ]; then
+                export GOARCH=arm
+                export GOARM=5
+                export CC=arm-linux-gnueabi-gcc
+                XRAY_ARCH="arm32-v5"
+              elif [ "$ARCH" = "386" ]; then
+                export CC=i686-linux-gnu-gcc
+                XRAY_ARCH="32"
+              elif [ "$ARCH" = "s390x" ]; then
+                export CC=s390x-linux-gnu-gcc
+                XRAY_ARCH="s390x"
+              elif [ "$ARCH" = "mipsle" ]; then
+                export CC=mipsel-linux-gnu-gcc
+                XRAY_ARCH="mips32le"
+              elif [ "$ARCH" = "mips" ]; then
+                export CC=mips-linux-gnu-gcc
+                XRAY_ARCH="mips32"
               fi
               BIN_NAME="4y-ui"
-              go build -ldflags "-w -s -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
-            elif [ "$OS" == "windows" ]; then
-              if [ "$ARCH" == "amd64" ]; then export CC=x86_64-w64-mingw32-gcc; XRAY_ARCH="64"
-              elif [ "$ARCH" == "386" ]; then export CC=i686-w64-mingw32-gcc; XRAY_ARCH="32"
+              # Build with pure static tags to eliminate glibc warnings (dlopen & getaddrinfo)
+              go build -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
+            
+            elif [ "$OS" = "windows" ]; then
+              if [ "$ARCH" = "amd64" ]; then
+                export CC=x86_64-w64-mingw32-gcc
+                XRAY_ARCH="64"
+              elif [ "$ARCH" = "386" ]; then
+                export CC=i686-w64-mingw32-gcc
+                XRAY_ARCH="32"
               fi
               BIN_NAME="4y-ui.exe"
-              go build -ldflags "-w -s" -o "temp_build/4y-ui/$BIN_NAME" main.go
+              go build -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s" -o "temp_build/4y-ui/$BIN_NAME" main.go
             fi
             
             mkdir -p temp_build/4y-ui/bin
             cp shared_geo/* temp_build/4y-ui/bin/
             
-            if [ "$OS" == "windows" ]; then
+            if [ "$OS" = "windows" ]; then
               XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-windows-${XRAY_ARCH}.zip"
             else
               XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-linux-${XRAY_ARCH}.zip"
@@ -95,18 +126,19 @@ jobs:
             curl -sL -o xray.zip "$XRAY_URL"
             unzip -q xray.zip -d xray_temp && rm xray.zip
             
-            if [ "$OS" == "linux" ]; then
+            # Use extreme compression: .tar.xz for Linux, .7z for Windows
+            if [ "$OS" = "linux" ]; then
               mv xray_temp/xray "temp_build/4y-ui/bin/xray-${OS}-${ARCH}"
               cp 4y-ui.service.* temp_build/4y-ui/ 2>/dev/null || true
               cp 4y-ui.sh temp_build/4y-ui/ 2>/dev/null || true
               cd temp_build
-              tar -czvf "../dist/4y-ui-${OS}-${ARCH}.tar.gz" 4y-ui
+              tar -cJf "../dist/4y-ui-${OS}-${ARCH}.tar.xz" 4y-ui
               cd ..
             else
               mv xray_temp/xray.exe "temp_build/4y-ui/bin/xray-${OS}-${ARCH}.exe"
               cp -r windows_files/* temp_build/4y-ui/bin/ 2>/dev/null || true
               cd temp_build
-              zip -r "../dist/4y-ui-${OS}-${ARCH}.zip" 4y-ui
+              7z a -t7z -m0=lzma2 -mx=9 "../dist/4y-ui-${OS}-${ARCH}.7z" 4y-ui
               cd ..
             fi
             
