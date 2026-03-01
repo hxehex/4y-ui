@@ -55,6 +55,6 @@ RUN chmod +x \
 
 ENV XUI_ENABLE_FAIL2BAN="true"
 EXPOSE 2053
-VOLUME[ "/etc/4y-ui" ]
+VOLUME [ "/etc/4y-ui" ]
 CMD [ "./4y-ui" ]
-ENTRYPOINT[ "/app/DockerEntrypoint.sh" ]
+ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
