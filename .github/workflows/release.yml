@@ -11,22 +11,11 @@ on:
       - "v*.*.*"
 
 jobs:
-  build:
+  mega-build:
+    name: Build All Architectures
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    strategy:
-      matrix:
-        platform:
-          - amd64
-          - arm64
-          - armv7
-          - armv6
-          - 386
-          - armv5
-          - s390x
-          - mipsle
-          - mips
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -38,160 +27,16 @@ jobs:
           check-latest: true
           cache: true
 
-      - name: Determine Toolchain
-        id: toolchain
-        run: |
-          case "${{ matrix.platform }}" in
-            amd64) BOOTLIN_ARCH="x86-64" ;;
-            arm64) BOOTLIN_ARCH="aarch64" ;;
-            armv7) BOOTLIN_ARCH="armv7-eabihf" ;;
-            armv6) BOOTLIN_ARCH="armv6-eabihf" ;;
-            armv5) BOOTLIN_ARCH="armv5-eabi" ;;
-            386) BOOTLIN_ARCH="x86-i686" ;;
-            s390x) BOOTLIN_ARCH="s390x-z13" ;;
-            mipsle) BOOTLIN_ARCH="mips32el" ;;
-            mips) BOOTLIN_ARCH="mips32" ;;
-          esac
-          echo "BOOTLIN_ARCH=$BOOTLIN_ARCH" >> $GITHUB_ENV
-
-      - name: Cache Bootlin Toolchain
-        id: cache-bootlin
-        uses: actions/cache@v4
-        with:
-          path: /opt/bootlin
-          key: bootlin-${{ env.BOOTLIN_ARCH }}-stable-v1
-
-      - name: Download Toolchain
-        if: steps.cache-bootlin.outputs.cache-hit != 'true'
-        run: |
-          TARBALL_BASE="https://toolchains.bootlin.com/downloads/releases/toolchains/${{ env.BOOTLIN_ARCH }}/tarballs/"
-          TARBALL_URL=$(curl -fsSL "$TARBALL_BASE" | grep -oE "${{ env.BOOTLIN_ARCH }}--musl--stable-[^\"]+\\.tar\\.xz" | sort -r | head -n1)
-          mkdir -p /opt/bootlin
-          curl -fL -sS "$TARBALL_BASE/$TARBALL_URL" | tar -xJ -C /opt/bootlin --strip-components=1
-
-      - name: Build 4y-ui
-        run: |
-          export PATH="/opt/bootlin/bin:$PATH"
-          export CC=$(find /opt/bootlin/bin -name '*-gcc.br_real' -type f -executable | head -n1)
-          export CGO_ENABLED=1
-          export GOOS=linux
-          export GOARCH=${{ matrix.platform }}
-          
-          case "${{ matrix.platform }}" in
-            armv7) export GOARCH=arm GOARM=7 ;;
-            armv6) export GOARCH=arm GOARM=6 ;;
-            armv5) export GOARCH=arm GOARM=5 ;;
-            mipsle) export GOARCH=mipsle GOMIPS=softfloat ;;
-            mips) export GOARCH=mips GOMIPS=softfloat ;;
-          esac
-          
-          go build -ldflags "-w -s -linkmode external -extldflags '-static'" -o xui-release -v main.go
-          
-          mkdir 4y-ui
-          cp xui-release 4y-ui/4y-ui
-          cp 4y-ui.service.* 4y-ui/ 2>/dev/null || true
-          cp 4y-ui.sh 4y-ui/ 2>/dev/null || true
-          mkdir 4y-ui/bin
-          
-      - name: Download Xray and Geo Files
-        run: |
-          cd 4y-ui/bin
-          Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/"
-          
-          case "${{ matrix.platform }}" in
-            amd64) XRAY_ZIP="Xray-linux-64.zip" ;;
-            arm64) XRAY_ZIP="Xray-linux-arm64-v8a.zip" ;;
-            armv7) XRAY_ZIP="Xray-linux-arm32-v7a.zip" ;;
-            armv6) XRAY_ZIP="Xray-linux-arm32-v6.zip" ;;
-            armv5) XRAY_ZIP="Xray-linux-arm32-v5.zip" ;;
-            386) XRAY_ZIP="Xray-linux-32.zip" ;;
-            s390x) XRAY_ZIP="Xray-linux-s390x.zip" ;;
-            mipsle) XRAY_ZIP="Xray-linux-mips32le.zip" ;;
-            mips) XRAY_ZIP="Xray-linux-mips32.zip" ;;
-          esac
-          
-          curl -sL -o xray.zip "${Xray_URL}${XRAY_ZIP}" &
-          curl -sL -o geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat &
-          curl -sL -o geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat &
-          curl -sL -o geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat &
-          curl -sL -o geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat &
-          curl -sL -o geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat &
-          curl -sL -o geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat &
-          wait
-          
-          unzip -q xray.zip xray && rm xray.zip
-          mv xray xray-linux-${{ matrix.platform }}
-
-      - name: Package
-        run: tar -zcvf 4y-ui-linux-${{ matrix.platform }}.tar.gz 4y-ui
-
-      - name: Upload files to Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: 4y-ui-linux-${{ matrix.platform }}
-          path: ./4y-ui-linux-${{ matrix.platform }}.tar.gz
-
-      - name: Upload files to GH release
-        uses: svenstaro/upload-release-action@v2
-        if: |
-          (github.event_name == 'release' && github.event.action == 'published') ||
-          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          file: 4y-ui-linux-${{ matrix.platform }}.tar.gz
-          asset_name: 4y-ui-linux-${{ matrix.platform }}.tar.gz
-          overwrite: true
-          prerelease: true
-
-  # =================================
-  #  Windows Build (Now on Ubuntu!)
-  # =================================
-  build-windows:
-    name: Build for Windows
-    permissions:
-      contents: write
-    strategy:
-      matrix:
-        platform:
-          - amd64
-          - 386
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Install MinGW (Instant C-Compiler for Windows)
+      - name: Install Native Cross-Compilers
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64
+          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi gcc-i686-linux-gnu gcc-s390x-linux-gnu gcc-mipsel-linux-gnu gcc-mips-linux-gnu mingw-w64 gcc-multilib zip
 
-      - name: Build 4y-ui for Windows (CGO)
+      - name: Download Shared Assets (GeoIP/Geosite)
         run: |
-          export CGO_ENABLED=1
-          export GOOS=windows
-          export GOARCH=${{ matrix.platform }}
-          export CC=${{ matrix.platform == 'amd64' && 'x86_64-w64-mingw32-gcc' || 'i686-w64-mingw32-gcc' }}
-
-          go build -ldflags "-w -s" -o xui-release.exe -v main.go
-
-      - name: Copy and download resources
-        run: |
-          mkdir 4y-ui
-          cp xui-release.exe 4y-ui/4y-ui.exe
-          mkdir 4y-ui/bin
-          cd 4y-ui/bin
-          
-          Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/"
-          XRAY_ZIP=$([[ "${{ matrix.platform }}" == "amd64" ]] && echo "Xray-windows-64.zip" || echo "Xray-windows-32.zip")
-          
-          curl -sL -o xray.zip "${Xray_URL}${XRAY_ZIP}" &
+          mkdir -p shared_geo
+          cd shared_geo
+          # Download all files simultaneously to save time
           curl -sL -o geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat &
           curl -sL -o geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat &
@@ -199,23 +44,86 @@ jobs:
           curl -sL -o geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat &
           wait
-          
-          unzip -q xray.zip xray.exe && rm xray.zip
-          mv xray.exe xray-windows-${{ matrix.platform }}.exe
-          
-          cd ../..
-          cp -r windows_files/* 4y-ui/bin/ 2>/dev/null || true
+          echo "Shared assets downloaded."
 
-      - name: Package to Zip
-        run: zip -r 4y-ui-windows-${{ matrix.platform }}.zip 4y-ui
+      - name: Compile and Package All
+        run: |
+          mkdir -p dist
+          PLATFORMS="linux/amd64 linux/arm64 linux/armv7 linux/armv6 linux/armv5 linux/386 linux/s390x linux/mipsle linux/mips windows/amd64 windows/386"
+          
+          for PLAT in $PLATFORMS; do
+            OS=${PLAT%/*}
+            ARCH=${PLAT#*/}
+            echo "========================================="
+            echo "Building $OS/$ARCH"
+            echo "========================================="
+            
+            # Reset variables for each loop
+            export CGO_ENABLED=1
+            export GOOS=$OS
+            export GOARCH=$ARCH
+            export GOARM=""
+            export GOMIPS=""
+            
+            if[ "$OS" == "linux" ]; then
+              if [ "$ARCH" == "amd64" ]; then export CC=gcc; XRAY_ARCH="64"
+              elif [ "$ARCH" == "arm64" ]; then export CC=aarch64-linux-gnu-gcc; XRAY_ARCH="arm64-v8a"
+              elif [ "$ARCH" == "armv7" ]; then export GOARCH=arm; export GOARM=7; export CC=arm-linux-gnueabihf-gcc; XRAY_ARCH="arm32-v7a"
+              elif[ "$ARCH" == "armv6" ]; then export GOARCH=arm; export GOARM=6; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v6"
+              elif[ "$ARCH" == "armv5" ]; then export GOARCH=arm; export GOARM=5; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v5"
+              elif[ "$ARCH" == "386" ]; then export CC=i686-linux-gnu-gcc; XRAY_ARCH="32"
+              elif [ "$ARCH" == "s390x" ]; then export CC=s390x-linux-gnu-gcc; XRAY_ARCH="s390x"
+              elif [ "$ARCH" == "mipsle" ]; then export CC=mipsel-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32le"
+              elif [ "$ARCH" == "mips" ]; then export CC=mips-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32"
+              fi
+              BIN_NAME="4y-ui"
+              # Linux Static Compile
+              go build -ldflags "-w -s -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
+            elif [ "$OS" == "windows" ]; then
+              if [ "$ARCH" == "amd64" ]; then export CC=x86_64-w64-mingw32-gcc; XRAY_ARCH="64"
+              elif[ "$ARCH" == "386" ]; then export CC=i686-w64-mingw32-gcc; XRAY_ARCH="32"
+              fi
+              BIN_NAME="4y-ui.exe"
+              # Windows Standard Compile
+              go build -ldflags "-w -s" -o "temp_build/4y-ui/$BIN_NAME" main.go
+            fi
+            
+            # Create folder structure
+            mkdir -p temp_build/4y-ui/bin
+            cp shared_geo/* temp_build/4y-ui/bin/
+            
+            # Download Xray Core
+            XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-${OS}-${XRAY_ARCH}.zip"
+            curl -sL -o xray.zip "$XRAY_URL"
+            unzip -q xray.zip -d xray_temp && rm xray.zip
+            
+            # Package Archive
+            if [ "$OS" == "linux" ]; then
+              mv xray_temp/xray "temp_build/4y-ui/bin/xray-${OS}-${ARCH}"
+              cp 4y-ui.service.* temp_build/4y-ui/ 2>/dev/null || true
+              cp 4y-ui.sh temp_build/4y-ui/ 2>/dev/null || true
+              cd temp_build
+              tar -czvf "../dist/4y-ui-${OS}-${ARCH}.tar.gz" 4y-ui
+              cd ..
+            else
+              mv xray_temp/xray.exe "temp_build/4y-ui/bin/xray-${OS}-${ARCH}.exe"
+              cp -r windows_files/* temp_build/4y-ui/bin/ 2>/dev/null || true
+              cd temp_build
+              zip -r "../dist/4y-ui-${OS}-${ARCH}.zip" 4y-ui
+              cd ..
+            fi
+            
+            # Cleanup
+            rm -rf temp_build xray_temp
+          done
 
-      - name: Upload files to Artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: 4y-ui-windows-${{ matrix.platform }}
-          path: ./4y-ui-windows-${{ matrix.platform }}.zip
+          name: 4y-ui-all-releases
+          path: dist/*
 
-      - name: Upload files to GH release
+      - name: Upload to GH Release
         uses: svenstaro/upload-release-action@v2
         if: |
           (github.event_name == 'release' && github.event.action == 'published') ||
@@ -223,7 +131,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: 4y-ui-windows-${{ matrix.platform }}.zip
-          asset_name: 4y-ui-windows-${{ matrix.platform }}.zip
+          file: dist/*
+          file_glob: true
           overwrite: true
           prerelease: true
