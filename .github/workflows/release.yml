@@ -24,19 +24,19 @@ jobs:
           - 386
           - armv5
           - s390x
-          - mipsle  # Added: Router support (Little Endian)
-          - mips    # Added: Router support (Big Endian)
+          - mipsle
+          - mips
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           check-latest: true
-          cache: true # Built-in Go module caching
+          cache: true
 
       - name: Determine Toolchain
         id: toolchain
@@ -110,7 +110,6 @@ jobs:
             mips) XRAY_ZIP="Xray-linux-mips32.zip" ;;
           esac
           
-          # MAGIC SPEEDUP: Download all 7 files simultaneously in the background
           curl -sL -o xray.zip "${Xray_URL}${XRAY_ZIP}" &
           curl -sL -o geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat &
@@ -118,7 +117,7 @@ jobs:
           curl -sL -o geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat &
           curl -sL -o geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat &
-          wait # Wait for all downloads to finish
+          wait
           
           unzip -q xray.zip xray && rm xray.zip
           mv xray xray-linux-${{ matrix.platform }}
@@ -146,7 +145,7 @@ jobs:
           prerelease: true
 
   # =================================
-  #  Windows Build (Optimized)
+  #  Windows Build (Now on Ubuntu!)
   # =================================
   build-windows:
     name: Build for Windows
@@ -156,31 +155,25 @@ jobs:
       matrix:
         platform:
           - amd64
-          - 386  # Added: 32-bit Windows support
-    runs-on: windows-latest
+          - 386
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
 
-      - name: Install MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: ${{ matrix.platform == 'amd64' && 'MINGW64' || 'MINGW32' }}
-          update: true
-          install: >-
-            ${{ matrix.platform == 'amd64' && 'mingw-w64-x86_64-gcc mingw-w64-x86_64-sqlite3' || 'mingw-w64-i686-gcc mingw-w64-i686-sqlite3' }}
-            pkg-config
+      - name: Install MinGW (Instant C-Compiler for Windows)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-mingw-w64
 
       - name: Build 4y-ui for Windows (CGO)
-        shell: msys2 {0}
         run: |
-          export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
           export CGO_ENABLED=1
           export GOOS=windows
           export GOARCH=${{ matrix.platform }}
@@ -189,7 +182,6 @@ jobs:
           go build -ldflags "-w -s" -o xui-release.exe -v main.go
 
       - name: Copy and download resources
-        shell: bash
         run: |
           mkdir 4y-ui
           cp xui-release.exe 4y-ui/4y-ui.exe
@@ -199,7 +191,6 @@ jobs:
           Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/"
           XRAY_ZIP=$([[ "${{ matrix.platform }}" == "amd64" ]] && echo "Xray-windows-64.zip" || echo "Xray-windows-32.zip")
           
-          # Parallel downloads for Windows
           curl -sL -o xray.zip "${Xray_URL}${XRAY_ZIP}" &
           curl -sL -o geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat &
@@ -216,9 +207,7 @@ jobs:
           cp -r windows_files/* 4y-ui/bin/ 2>/dev/null || true
 
       - name: Package to Zip
-        shell: pwsh
-        run: |
-          Compress-Archive -Path .\4y-ui -DestinationPath "4y-ui-windows-${{ matrix.platform }}.zip"
+        run: zip -r 4y-ui-windows-${{ matrix.platform }}.zip 4y-ui
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v4
