@@ -63,7 +63,6 @@ jobs:
             export GOARM=""
             export GOMIPS=""
             
-            # Explicit multi-line bash to guarantee zero syntax errors
             if [ "$OS" = "linux" ]; then
               if [ "$ARCH" = "amd64" ]; then
                 export CC=gcc
@@ -100,8 +99,7 @@ jobs:
                 XRAY_ARCH="mips32"
               fi
               BIN_NAME="4y-ui"
-              # Build with pure static tags to eliminate glibc warnings (dlopen & getaddrinfo)
-              go build -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
+              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid= -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
             
             elif [ "$OS" = "windows" ]; then
               if [ "$ARCH" = "amd64" ]; then
@@ -112,7 +110,7 @@ jobs:
                 XRAY_ARCH="32"
               fi
               BIN_NAME="4y-ui.exe"
-              go build -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s" -o "temp_build/4y-ui/$BIN_NAME" main.go
+              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid=" -o "temp_build/4y-ui/$BIN_NAME" main.go
             fi
             
             mkdir -p temp_build/4y-ui/bin
@@ -126,19 +124,18 @@ jobs:
             curl -sL -o xray.zip "$XRAY_URL"
             unzip -q xray.zip -d xray_temp && rm xray.zip
             
-            # Use extreme compression: .tar.xz for Linux, .7z for Windows
             if [ "$OS" = "linux" ]; then
               mv xray_temp/xray "temp_build/4y-ui/bin/xray-${OS}-${ARCH}"
               cp 4y-ui.service.* temp_build/4y-ui/ 2>/dev/null || true
               cp 4y-ui.sh temp_build/4y-ui/ 2>/dev/null || true
               cd temp_build
-              tar -cJf "../dist/4y-ui-${OS}-${ARCH}.tar.xz" 4y-ui
+              env XZ_OPT="-9e -T0" tar -cJf "../dist/4y-ui-${OS}-${ARCH}.tar.xz" 4y-ui
               cd ..
             else
               mv xray_temp/xray.exe "temp_build/4y-ui/bin/xray-${OS}-${ARCH}.exe"
               cp -r windows_files/* temp_build/4y-ui/bin/ 2>/dev/null || true
               cd temp_build
-              7z a -t7z -m0=lzma2 -mx=9 "../dist/4y-ui-${OS}-${ARCH}.7z" 4y-ui
+              7z a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=64m -ms=on -mmt=on "../dist/4y-ui-${OS}-${ARCH}.7z" 4y-ui
               cd ..
             fi
             
