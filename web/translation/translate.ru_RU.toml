@@ -460,6 +460,8 @@
 "FreedomStrategyDesc" = "Установка стратегии вывода сети в протоколе Freedom"
 "RoutingStrategy" = "Настройка маршрутизации доменов"
 "RoutingStrategyDesc" = "Установка общей стратегии маршрутизации разрешения DNS"
+"outboundTestUrl" = "URL для теста исходящего"
+"outboundTestUrlDesc" = "URL для проверки подключения исходящего"
 "Torrent" = "Заблокировать BitTorrent"
 "Inbounds" = "Входящие подключения"
 "InboundsDesc" = "Изменение шаблона конфигурации для подключения определенных клиентов"
@@ -523,6 +525,12 @@
 "accountInfo" = "Информация об учетной записи"
 "outboundStatus" = "Статус исходящего подключения"
 "sendThrough" = "Отправить через"
+"test" = "Тест"
+"testResult" = "Результат теста"
+"testing" = "Тестирование соединения..."
+"testSuccess" = "Тест успешен"
+"testFailed" = "Тест не пройден"
+"testError" = "Не удалось протестировать исходящее подключение"
 
 [pages.xray.balancer]
 "addBalancer" = "Создать балансировщик"
