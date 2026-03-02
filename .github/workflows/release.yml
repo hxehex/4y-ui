@@ -27,10 +27,10 @@ jobs:
           check-latest: true
           cache: true
 
-      - name: Install Native Cross-Compilers & Archivers
+      - name: Install Native Cross-Compilers, UPX & Archivers
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi gcc-i686-linux-gnu gcc-s390x-linux-gnu gcc-mipsel-linux-gnu gcc-mips-linux-gnu mingw-w64 xz-utils p7zip-full
+          sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-arm-linux-gnueabi gcc-i686-linux-gnu gcc-s390x-linux-gnu gcc-mipsel-linux-gnu gcc-mips-linux-gnu mingw-w64 xz-utils p7zip-full upx-ucl zip
 
       - name: Download Shared Assets (GeoIP/Geosite)
         run: |
@@ -43,9 +43,8 @@ jobs:
           curl -sL -o geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat &
           curl -sL -o geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat &
           wait
-          echo "Shared assets downloaded."
 
-      - name: Compile and Package All
+      - name: Compile and Package All Versions
         run: |
           mkdir -p dist
           PLATFORMS="linux/amd64 linux/arm64 linux/armv7 linux/armv6 linux/armv5 linux/386 linux/s390x linux/mipsle linux/mips windows/amd64 windows/386"
@@ -53,68 +52,40 @@ jobs:
           for PLAT in $PLATFORMS; do
             OS=${PLAT%/*}
             ARCH=${PLAT#*/}
-            echo "========================================="
-            echo "Building $OS/$ARCH"
-            echo "========================================="
+            echo "Building $OS/$ARCH (Standard and UPX versions)..."
             
             export CGO_ENABLED=1
             export GOOS=$OS
             export GOARCH=$ARCH
-            export GOARM=""
-            export GOMIPS=""
             
             if [ "$OS" = "linux" ]; then
-              if [ "$ARCH" = "amd64" ]; then
-                export CC=gcc
-                XRAY_ARCH="64"
-              elif [ "$ARCH" = "arm64" ]; then
-                export CC=aarch64-linux-gnu-gcc
-                XRAY_ARCH="arm64-v8a"
-              elif [ "$ARCH" = "armv7" ]; then
-                export GOARCH=arm
-                export GOARM=7
-                export CC=arm-linux-gnueabihf-gcc
-                XRAY_ARCH="arm32-v7a"
-              elif [ "$ARCH" = "armv6" ]; then
-                export GOARCH=arm
-                export GOARM=6
-                export CC=arm-linux-gnueabi-gcc
-                XRAY_ARCH="arm32-v6"
-              elif [ "$ARCH" = "armv5" ]; then
-                export GOARCH=arm
-                export GOARM=5
-                export CC=arm-linux-gnueabi-gcc
-                XRAY_ARCH="arm32-v5"
-              elif [ "$ARCH" = "386" ]; then
-                export CC=i686-linux-gnu-gcc
-                XRAY_ARCH="32"
-              elif [ "$ARCH" = "s390x" ]; then
-                export CC=s390x-linux-gnu-gcc
-                XRAY_ARCH="s390x"
-              elif [ "$ARCH" = "mipsle" ]; then
-                export CC=mipsel-linux-gnu-gcc
-                XRAY_ARCH="mips32le"
-              elif [ "$ARCH" = "mips" ]; then
-                export CC=mips-linux-gnu-gcc
-                XRAY_ARCH="mips32"
+              if [ "$ARCH" = "amd64" ]; then export CC=gcc; XRAY_ARCH="64"
+              elif [ "$ARCH" = "arm64" ]; then export CC=aarch64-linux-gnu-gcc; XRAY_ARCH="arm64-v8a"
+              elif [ "$ARCH" = "armv7" ]; then export GOARCH=arm; export GOARM=7; export CC=arm-linux-gnueabihf-gcc; XRAY_ARCH="arm32-v7a"
+              elif [ "$ARCH" = "armv6" ]; then export GOARCH=arm; export GOARM=6; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v6"
+              elif [ "$ARCH" = "armv5" ]; then export GOARCH=arm; export GOARM=5; export CC=arm-linux-gnueabi-gcc; XRAY_ARCH="arm32-v5"
+              elif [ "$ARCH" = "386" ]; then export CC=i686-linux-gnu-gcc; XRAY_ARCH="32"
+              elif [ "$ARCH" = "s390x" ]; then export CC=s390x-linux-gnu-gcc; XRAY_ARCH="s390x"
+              elif [ "$ARCH" = "mipsle" ]; then export CC=mipsel-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32le"
+              elif [ "$ARCH" = "mips" ]; then export CC=mips-linux-gnu-gcc; export GOMIPS=softfloat; XRAY_ARCH="mips32"
               fi
               BIN_NAME="4y-ui"
-              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid= -linkmode external -extldflags '-static'" -o "temp_build/4y-ui/$BIN_NAME" main.go
-            
+              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid= -linkmode external -extldflags '-static'" -o "$BIN_NAME" main.go
             elif [ "$OS" = "windows" ]; then
-              if [ "$ARCH" = "amd64" ]; then
-                export CC=x86_64-w64-mingw32-gcc
-                XRAY_ARCH="64"
-              elif [ "$ARCH" = "386" ]; then
-                export CC=i686-w64-mingw32-gcc
-                XRAY_ARCH="32"
+              if [ "$ARCH" = "amd64" ]; then export CC=x86_64-w64-mingw32-gcc; XRAY_ARCH="64"
+              elif [ "$ARCH" = "386" ]; then export CC=i686-w64-mingw32-gcc; XRAY_ARCH="32"
               fi
               BIN_NAME="4y-ui.exe"
-              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid=" -o "temp_build/4y-ui/$BIN_NAME" main.go
+              go build -trimpath -tags "netgo,osusergo,sqlite_omit_load_extension" -ldflags "-w -s -buildid=" -o "$BIN_NAME" main.go
             fi
+
+            mkdir -p pack_upx/4y-ui/bin pack_noupx/4y-ui/bin
+            cp "$BIN_NAME" pack_noupx/4y-ui/
             
-            mkdir -p temp_build/4y-ui/bin
-            cp shared_geo/* temp_build/4y-ui/bin/
+            cp "$BIN_NAME" pack_upx/4y-ui/
+            if [ "$ARCH" != "s390x" ] && [ "$ARCH" != "mips" ] && [ "$ARCH" != "mipsle" ]; then
+                upx --ultra-brute --best --no-time --small --small "pack_upx/4y-ui/$BIN_NAME" || true
+            fi
             
             if [ "$OS" = "windows" ]; then
               XRAY_URL="https://github.com/XTLS/Xray-core/releases/download/v26.2.2/Xray-windows-${XRAY_ARCH}.zip"
@@ -124,39 +95,35 @@ jobs:
             curl -sL -o xray.zip "$XRAY_URL"
             unzip -q xray.zip -d xray_temp && rm xray.zip
             
-            if [ "$OS" = "linux" ]; then
-              mv xray_temp/xray "temp_build/4y-ui/bin/xray-${OS}-${ARCH}"
-              cp 4y-ui.service.* temp_build/4y-ui/ 2>/dev/null || true
-              cp 4y-ui.sh temp_build/4y-ui/ 2>/dev/null || true
-              cd temp_build
-              env XZ_OPT="-9e -T0" tar -cJf "../dist/4y-ui-${OS}-${ARCH}.tar.xz" 4y-ui
-              cd ..
-            else
-              mv xray_temp/xray.exe "temp_build/4y-ui/bin/xray-${OS}-${ARCH}.exe"
-              cp -r windows_files/* temp_build/4y-ui/bin/ 2>/dev/null || true
-              cd temp_build
-              7z a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=64m -ms=on -mmt=on "../dist/4y-ui-${OS}-${ARCH}.7z" 4y-ui
-              cd ..
-            fi
-            
-            rm -rf temp_build xray_temp
+            for TYPE in "upx" "noupx"; do
+              TARGET_DIR="pack_${TYPE}/4y-ui"
+              suffix=$([ "$TYPE" = "noupx" ] && echo "-no-upx" || echo "")
+              
+              if [ "$OS" = "linux" ]; then
+                mv xray_temp/xray "${TARGET_DIR}/bin/xray-linux-${ARCH}"
+                cp shared_geo/* "${TARGET_DIR}/bin/"
+                cp 4y-ui.service.* 4y-ui.sh "${TARGET_DIR}/" 2>/dev/null || true
+                cd pack_${TYPE}
+                env XZ_OPT="-9e -T0" tar --owner=0 --group=0 --numeric-owner -cJf "../../dist/4y-ui-linux-${ARCH}${suffix}.tar.xz" 4y-ui
+                cd ../..
+              else
+                mv xray_temp/xray.exe "${TARGET_DIR}/bin/xray-windows-${ARCH}.exe"
+                cp shared_geo/* "${TARGET_DIR}/bin/"
+                cp -r windows_files/* "${TARGET_DIR}/bin/" 2>/dev/null || true
+                cd pack_${TYPE}
+                7z a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=64m -ms=on -mmt=on "../../dist/4y-ui-windows-${ARCH}${suffix}.7z" 4y-ui
+                cd ../..
+              fi
+            done
+            rm -rf pack_upx pack_noupx xray_temp "$BIN_NAME"
           done
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: 4y-ui-all-releases
-          path: dist/*
 
       - name: Upload to GH Release
         uses: svenstaro/upload-release-action@v2
-        if: |
-          (github.event_name == 'release' && github.event.action == 'published') ||
-          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
           file: dist/*
           file_glob: true
           overwrite: true
-          prerelease: true
