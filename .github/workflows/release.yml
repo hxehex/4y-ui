@@ -9,16 +9,28 @@ on:
       - main
     tags:
       - "v*.*.*"
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   mega-build:
     name: Build All Architectures
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
       - name: Setup Go
         uses: actions/setup-go@v6
@@ -57,6 +69,8 @@ jobs:
             export CGO_ENABLED=1
             export GOOS=$OS
             export GOARCH=$ARCH
+            export GOARM=""
+            export GOMIPS=""
             
             if [ "$OS" = "linux" ]; then
               if [ "$ARCH" = "amd64" ]; then export CC=gcc; XRAY_ARCH="64"
@@ -100,19 +114,21 @@ jobs:
               suffix=$([ "$TYPE" = "noupx" ] && echo "-no-upx" || echo "")
               
               if [ "$OS" = "linux" ]; then
-                mv xray_temp/xray "${TARGET_DIR}/bin/xray-linux-${ARCH}"
+                cp xray_temp/xray "${TARGET_DIR}/bin/xray-linux-${ARCH}"
                 cp shared_geo/* "${TARGET_DIR}/bin/"
                 cp 4y-ui.service.* 4y-ui.sh "${TARGET_DIR}/" 2>/dev/null || true
+                
                 cd pack_${TYPE}
-                env XZ_OPT="-9e -T0" tar --owner=0 --group=0 --numeric-owner -cJf "../../dist/4y-ui-linux-${ARCH}${suffix}.tar.xz" 4y-ui
-                cd ../..
+                env XZ_OPT="-9e -T0" tar --owner=0 --group=0 --numeric-owner -cJf "../dist/4y-ui-linux-${ARCH}${suffix}.tar.xz" 4y-ui
+                cd ..
               else
-                mv xray_temp/xray.exe "${TARGET_DIR}/bin/xray-windows-${ARCH}.exe"
+                cp xray_temp/xray.exe "${TARGET_DIR}/bin/xray-windows-${ARCH}.exe"
                 cp shared_geo/* "${TARGET_DIR}/bin/"
                 cp -r windows_files/* "${TARGET_DIR}/bin/" 2>/dev/null || true
+                
                 cd pack_${TYPE}
-                7z a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=64m -ms=on -mmt=on "../../dist/4y-ui-windows-${ARCH}${suffix}.7z" 4y-ui
-                cd ../..
+                7z a -t7z -m0=lzma2 -mx=9 -mfb=273 -md=64m -ms=on -mmt=on "../dist/4y-ui-windows-${ARCH}${suffix}.7z" 4y-ui
+                cd ..
               fi
             done
             rm -rf pack_upx pack_noupx xray_temp "$BIN_NAME"
