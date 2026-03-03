@@ -219,16 +219,27 @@
           })
       },
       setQrCode(elementId, content) {
+        let qrSize = 250;
+        if (content && content.length > 200) {
+            qrSize = 400;
+        }
+
         new QRious({
           element: document.querySelector('#' + elementId),
-          size: 400,
+          size: qrSize,
           value: content,
           background: 'white',
           backgroundAlpha: 0,
           foreground: 'black',
           padding: 2,
-          level: 'L'
+          level: 'L' 
         });
+
+        const canvas = document.querySelector('#' + elementId);
+        if (canvas) {
+            canvas.style.maxWidth = '100%';
+            canvas.style.height = 'auto';
+        }
       },
       genSubLink(subID) {
         return app.subSettings.subURI + subID;

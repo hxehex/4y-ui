@@ -111,6 +111,12 @@
               padding: 2,
               level: 'L'
             });
+            
+            const canvas = document.getElementById(elementId);
+            if (canvas) {
+                canvas.style.maxWidth = '100%';
+                canvas.style.height = 'auto';
+            }
           },
           copy(content) {
             ClipboardManager
