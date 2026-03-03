@@ -14,6 +14,22 @@
                 <span>{{ i18n "useIPv4ForHost" }}</span>
               </a-space>
             </template>
+            <a-divider style="margin: 8px 0"></a-divider>
+            <b>QR Customization</b>
+            <a-space direction="horizontal">
+               <span style="min-width: 40px">Size:</span>
+               <a-slider v-model="qrSettings.size" :min="150" :max="800" :step="10" style="width: 100px" @change="redrawAll()"></a-slider>
+               <span>[[ qrSettings.size ]]px</span>
+            </a-space>
+            <a-space direction="horizontal">
+               <span style="min-width: 40px">Level:</span>
+               <a-select v-model="qrSettings.level" size="small" @change="redrawAll()" style="width: 100px">
+                  <a-select-option value="L">L (7%)</a-select-option>
+                  <a-select-option value="M">M (15%)</a-select-option>
+                  <a-select-option value="Q">Q (25%)</a-select-option>
+                  <a-select-option value="H">H (30%)</a-select-option>
+               </a-select>
+            </a-space>
           </a-space>
         </template>
         <a-icon type="setting"></a-icon>
@@ -112,7 +128,6 @@
       this.client = client;
       this.subId = '';
       this.qrcodes = [];
-      // Reset the status fetched flag when showing the modal
       if (qrModalApp) qrModalApp.statusFetched = false;
       if (this.inbound.protocol == Protocols.WIREGUARD) {
         this.inbound.genInboundLinks(dbInbound.remark).split('\r\n').forEach((l, index) => {
@@ -147,6 +162,10 @@
       qrModal: qrModal,
       serverStatus: null,
       statusFetched: false,
+      qrSettings: {
+        size: 300,
+        level: 'L'
+      }
     },
     methods: {
       async getStatus() {
@@ -172,13 +191,11 @@
         }
         
         if (row.useIPv4 && this.serverStatus.publicIP.ipv4) {
-          // Replace the hostname or IP in the link with the IPv4 address
           const originalLink = row.originalLink;
           const url = new URL(originalLink);
           const ipv4 = this.serverStatus.publicIP.ipv4;
           
           if (qrModal.inbound.protocol == Protocols.WIREGUARD) {
-            // Special handling for WireGuard config
             const endpointRegex = /Endpoint = ([^:]+):(\d+)/;
             const match = originalLink.match(endpointRegex);
             if (match) {
@@ -188,22 +205,17 @@
               );
             }
           } else {
-            // For other protocols using URL format
             url.hostname = ipv4;
             row.link = url.toString();
           }
         } else {
-          // Restore original link
           row.link = row.originalLink;
         }
         
-        // Update QR code with transition effect
         const canvasElement = document.querySelector('#qrCode-' + index);
         if (canvasElement) {
-          // Add flash animation class
           canvasElement.classList.add('qr-flash');
           
-          // Remove the class after animation completes
           setTimeout(() => {
             canvasElement.classList.remove('qr-flash');
           }, 600);
@@ -219,27 +231,33 @@
           })
       },
       setQrCode(elementId, content) {
-        let qrSize = 250;
-        if (content && content.length > 200) {
-            qrSize = 400;
-        }
-
+        const canvas = document.querySelector('#' + elementId);
+        if (!canvas) return;
+        
         new QRious({
-          element: document.querySelector('#' + elementId),
-          size: qrSize,
+          element: canvas,
+          size: this.qrSettings.size,
           value: content,
           background: 'white',
           backgroundAlpha: 0,
           foreground: 'black',
           padding: 2,
-          level: 'L' 
+          level: this.qrSettings.level
         });
 
-        const canvas = document.querySelector('#' + elementId);
-        if (canvas) {
-            canvas.style.maxWidth = '100%';
-            canvas.style.height = 'auto';
+        canvas.style.maxWidth = '100%';
+        canvas.style.height = 'auto';
+      },
+      redrawAll() {
+        if (qrModal.subId) {
+          this.setQrCode("qrCode-sub", this.genSubLink(qrModal.subId));
+          if (app.subSettings && app.subSettings.subJsonEnable) {
+            this.setQrCode("qrCode-subJson", this.genSubJsonLink(qrModal.subId));
+          }
         }
+        qrModal.qrcodes.forEach((element, index) => {
+          this.setQrCode("qrCode-" + index, element.link);
+        });
       },
       genSubLink(subID) {
         return app.subSettings.subURI + subID;
@@ -267,7 +285,6 @@
         }
       } else {
         this.revertOverflow();
-        // Reset the flag when modal is closed so it will fetch again next time
         this.statusFetched = false;
       }
       if (qrModal.client && qrModal.client.subId) {
@@ -279,7 +296,6 @@
       }
       qrModal.qrcodes.forEach((element, index) => {
         this.setQrCode("qrCode-" + index, element.link);
-        // Update links based on current toggle state
         if (element.useIPv4 && this.serverStatus && this.serverStatus.publicIP) {
           this.updateLink(index);
         }
