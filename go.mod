@@ -25,13 +25,13 @@ require (
 	golang.org/x/crypto v0.48.0
 	golang.org/x/sys v0.41.0
 	golang.org/x/text v0.34.0
-	google.golang.org/grpc v1.79.1
+	google.golang.org/grpc v1.79.3
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.1.0 // indirect
+	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/apernet/quic-go v0.57.2-0.20260111184307-eec823306178 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
